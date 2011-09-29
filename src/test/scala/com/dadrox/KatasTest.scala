@@ -13,6 +13,17 @@ class KatasTest {
       \_/\_/ \___/|_|  |_|\_\_|_| |_|\__, |   \_/\_/ |_|\__|_| |_| |_____|_|___/\__|___/
                                      |___/
      */
+    /** In Scala, lists are objects of type List[A], where A can be any type.
+        Lists are effective for many recursive algorithms, because it's easy to add elements to the head of a list,
+        and to get the tail of the list, which is everything but the first element.
+
+        The solutions to the problems in this section will be in objects named after the problems (P01, P02, etc.).
+        You can compile the source files with scalac and thereafter use import to bring the functions into scope.
+        Some of the problems can be solved easily by using imported solutions to previous problems.
+
+        In many cases, there's more than one reasonable approach. The files linked here may include multiple solutions, with all but one commented out.
+        They'll also indicate whether there's a builtin method in Scala that accomplishes the task.
+     */
 
     @Test
     def `P01 (*) Find the last elment of a list` {
@@ -286,6 +297,12 @@ class KatasTest {
 /_/   \_\_|  |_|\__|_| |_|_| |_| |_|\___|\__|_|\___|
 
      */
+    /** For the next section, we're going to take a different tack with the solutions.
+        We'll declare a new class, S99Int, and an implicit conversion from regular Ints.
+        The arithmetic1 file contains the starting definitions for this section.
+        Each individual solution will show the relevant additions to the S99Int class.
+        The full class will be given at the end of the section.
+     */
 
     @Test
     def `P31 (**) Determine whether a given integer number is prime.` {
@@ -404,6 +421,9 @@ class KatasTest {
     }
 
     // LOGIC AND CODES
+    /** As in the previous section, we will start with a skeleton file, logic1.scala, and add code to it for each problem.
+        The difference here is that the file starts out almost empty.
+     */
 
     @Test
     /** Define functions and, or, nand, nor, xor, impl, and equ (for logical equivalence) which return true or false according to the result of their respective operations;
@@ -473,6 +493,36 @@ class KatasTest {
     }
 
     // BINARY TREES
+    /** A binary tree is either empty or it is composed of a root element and two successors, which are binary trees themselves.
+
+        We shall use the following classes to represent binary trees. (Also available in tree1.scala.)
+        An End is equivalent to an empty tree. A Branch has a value, and two descendant trees.
+        The toString functions are relatively arbitrary, but they yield a more compact output than Scala's default.
+        Putting a plus in front of the T makes the class covariant; it will be able to hold subtypes of whatever type it's created for.
+        (This is important so that End can be a singleton object;
+        as a singleton, it must have a specific type, so we give it type Nothing, which is a subtype of every other type.)
+        <pre>
+        sealed abstract class Tree[+T]
+        case class Node[+T](value: T, left: Tree[T], right: Tree[T]) extends Tree[T] {
+          override def toString = "T(" + value.toString + " " + left.toString + " " + right.toString + ")"
+        }
+        case object End extends Tree[Nothing] {
+          override def toString = "."
+        }
+        object Node {
+          def apply[T](value: T): Node[T] = Node(value, End, End)
+        }
+        </pre>
+
+        The example tree on the right is given by
+
+        Node('a',
+             Node('b', Node('d'), Node('e')),
+             Node('c', End, Node('f', Node('g'), End)))
+        A tree with only a root node would be Node('a') and an empty tree would be End.
+
+        Throughout this section, we will be adding methods to the classes above, mostly to Tree.
+     */
 
     @Test
     @Ignore // not necessary due to static typing :D
@@ -589,102 +639,113 @@ class KatasTest {
     }
 
     @Test
-    /**
-An internal node of a binary tree has either one or two non-empty successors. Write a method internalList to collect them in a list.
-scala> Node('a', Node('b'), Node('c', Node('d'), Node('e'))).internalList
-res0: List[Char] = List(a, c)
+    /** An internal node of a binary tree has either one or two non-empty successors.
+        Write a method internalList to collect them in a list.
+        scala> Node('a', Node('b'), Node('c', Node('d'), Node('e'))).internalList
+        res0: List[Char] = List(a, c)
      */
     def `P62 (*) Collect the internal nodes of a binary tree in a list.` {
     }
 
     @Test
-    /**
-A node of a binary tree is at level N if the path from the root to the node has length N-1. The root node is at level 1. Write a method atLevel to collect all nodes at a given level in a list.
-scala> Node('a', Node('b'), Node('c', Node('d'), Node('e'))).atLevel(2)
-res0: List[Char] = List(b, c)
-Using atLevel it is easy to construct a method levelOrder which creates the level-order sequence of the nodes. However, there are more efficient ways to do that.
+    /** A node of a binary tree is at level N if the path from the root to the node has length N-1.
+        The root node is at level 1. Write a method atLevel to collect all nodes at a given level in a list.
+        scala> Node('a', Node('b'), Node('c', Node('d'), Node('e'))).atLevel(2)
+        res0: List[Char] = List(b, c)
+        Using atLevel it is easy to construct a method levelOrder which creates the level-order sequence of the nodes.
+        However, there are more efficient ways to do that.
      */
     def `P62B (*) Collect the nodes at a given level in a list.` {
     }
 
     @Test
-    /**
-A complete binary tree with height H is defined as follows: The levels 1,2,3,...,H-1 contain the maximum number of nodes (i.e 2(i-1) at the level i, note that we start counting the levels from 1 at the root). In level H, which may contain less than the maximum possible number of nodes, all the nodes are "left-adjusted". This means that in a levelorder tree traversal all internal nodes come first, the leaves come second, and empty successors (the Ends which are not really nodes!) come last.
-Particularly, complete binary trees are used as data structures (or addressing schemes) for heaps.
+    /** A complete binary tree with height H is defined as follows:
+        The levels 1,2,3,...,H-1 contain the maximum number of nodes (i.e 2(i-1) at the level i, note that we start counting the levels from 1 at the root).
+        In level H, which may contain less than the maximum possible number of nodes, all the nodes are "left-adjusted".
+        This means that in a levelorder tree traversal all internal nodes come first, the leaves come second, and empty successors (the Ends which are not really nodes!) come last.
+        Particularly, complete binary trees are used as data structures (or addressing schemes) for heaps.
 
-We can assign an address number to each node in a complete binary tree by enumerating the nodes in levelorder, starting at the root with number 1. In doing so, we realize that for every node X with address A the following property holds: The address of X's left and right successors are 2*A and 2*A+1, respectively, supposed the successors do exist. This fact can be used to elegantly construct a complete binary tree structure. Write a method completeBinaryTree that takes as parameters the number of nodes and the value to put in each node.
+        We can assign an address number to each node in a complete binary tree by enumerating the nodes in levelorder, starting at the root with number 1.
+        In doing so, we realize that for every node X with address A the following property holds:
+        The address of X's left and right successors are 2*A and 2*A+1, respectively, supposed the successors do exist.
+        This fact can be used to elegantly construct a complete binary tree structure.
+        Write a method completeBinaryTree that takes as parameters the number of nodes and the value to put in each node.
 
-scala> Tree.completeBinaryTree(6, "x")
-res0: Node[String] = T(x T(x T(x . .) T(x . .)) T(x T(x . .) .))
+        scala> Tree.completeBinaryTree(6, "x")
+        res0: Node[String] = T(x T(x T(x . .) T(x . .)) T(x T(x . .) .))
      */
     def `P63 (**) Construct a complete binary tree.` {
     }
 
     @Test
-    /**
-As a preparation for drawing a tree, a layout algorithm is required to determine the position of each node in a rectangular grid.
-Several layout methods are conceivable, one of them is shown in the illustration on the right. http://aperiodic.net/phil/scala/s-99/p64.gif
-In this layout strategy, the position of a node v is obtained by the following two rules:
+    /** As a preparation for drawing a tree, a layout algorithm is required to determine the position of each node in a rectangular grid.
+        Several layout methods are conceivable, one of them is shown in the illustration on the right. http://aperiodic.net/phil/scala/s-99/p64.gif
+        In this layout strategy, the position of a node v is obtained by the following two rules:
 
-x(v) is equal to the position of the node v in the inorder sequence
-y(v) is equal to the depth of the node v in the tree
-In order to store the position of the nodes, we add a new class with the additional information.
+        x(v) is equal to the position of the node v in the inorder sequence
+        y(v) is equal to the depth of the node v in the tree
+        In order to store the position of the nodes, we add a new class with the additional information.
 
-case class PositionedNode[+T](override val value: T, override val left: Tree[T], override val right: Tree[T], x: Int, y: Int) extends Node[T](value, left, right) {
-  override def toString = "T[" + x.toString + "," + y.toString + "](" + value.toString + " " + left.toString + " " + right.toString + ")"
-}
-Write a method layoutBinaryTree that turns a tree of normal Nodes into a tree of PositionedNodes.
+        case class PositionedNode[+T](override val value: T, override val left: Tree[T], override val right: Tree[T], x: Int, y: Int) extends Node[T](value, left, right) {
+          override def toString = "T[" + x.toString + "," + y.toString + "](" + value.toString + " " + left.toString + " " + right.toString + ")"
+        }
+        Write a method layoutBinaryTree that turns a tree of normal Nodes into a tree of PositionedNodes.
 
-scala> Node('a', Node('b', End, Node('c')), Node('d')).layoutBinaryTree
-res0: PositionedNode[Char] = T[3,1](a T[1,2](b . T[2,3](c . .)) T[4,2](d . .))
-The tree at right may be constructed with Tree.fromList(List('n','k','m','c','a','h','g','e','u','p','s','q')). Use it to check your code.
+        scala> Node('a', Node('b', End, Node('c')), Node('d')).layoutBinaryTree
+        res0: PositionedNode[Char] = T[3,1](a T[1,2](b . T[2,3](c . .)) T[4,2](d . .))
+        The tree at right may be constructed with Tree.fromList(List('n','k','m','c','a','h','g','e','u','p','s','q')). Use it to check your code.
      */
     def `P64 (**) Layout a binary tree (1).` {
     }
 
     @Test
-    /**
-An alternative layout method is depicted in the illustration opposite. Find out the rules and write the corresponding method. Hint: On a given level, the horizontal distance between neighboring nodes is constant.
-Use the same conventions as in problem P64.
+    /** An alternative layout method is depicted in the illustration opposite.
+        Find out the rules and write the corresponding method.
+        Hint: On a given level, the horizontal distance between neighboring nodes is constant.
+        Use the same conventions as in problem P64.
 
-http://aperiodic.net/phil/scala/s-99/p65.gif
+        http://aperiodic.net/phil/scala/s-99/p65.gif
 
-scala> Node('a', Node('b', End, Node('c')), Node('d')).layoutBinaryTree2
-res0: PositionedNode[Char] = T[3,1]('a T[1,2]('b . T[2,3]('c . .)) T[5,2]('d . .))
-The tree at right may be constructed with Tree.fromList(List('n','k','m','c','a','e','d','g','u','p','q')). Use it to check your code.
+        scala> Node('a', Node('b', End, Node('c')), Node('d')).layoutBinaryTree2
+        res0: PositionedNode[Char] = T[3,1]('a T[1,2]('b . T[2,3]('c . .)) T[5,2]('d . .))
+        The tree at right may be constructed with Tree.fromList(List('n','k','m','c','a','e','d','g','u','p','q')). Use it to check your code.
      */
     def `P65 (**) Layout a binary tree (2).` {
     }
 
     @Test
-    /**
-Yet another layout strategy is shown in the illustration opposite. The method yields a very compact layout while maintaining a certain symmetry in every node. Find out the rules and write the corresponding method. Hint: Consider the horizontal distance between a node and its successor nodes. How tight can you pack together two subtrees to construct the combined binary tree?
-Use the same conventions as in problem P64 and P65. Note: This is a difficult problem. Don't give up too early!
+    /** Yet another layout strategy is shown in the illustration opposite.
+        The method yields a very compact layout while maintaining a certain symmetry in every node.
+        Find out the rules and write the corresponding method.
+        Hint: Consider the horizontal distance between a node and its successor nodes.
+        How tight can you pack together two subtrees to construct the combined binary tree?
+        Use the same conventions as in problem P64 and P65. Note: This is a difficult problem. Don't give up too early!
 
-http://aperiodic.net/phil/scala/s-99/p66.gif
+        http://aperiodic.net/phil/scala/s-99/p66.gif
 
-scala> Node('a', Node('b', End, Node('c')), Node('d')).layoutBinaryTree3
-res0: PositionedNode[Char] = T[2,1]('a T[1,2]('b . T[2,3]('c . .)) T[3,2]('d . .))
-Which layout do you like most?
+        scala> Node('a', Node('b', End, Node('c')), Node('d')).layoutBinaryTree3
+        res0: PositionedNode[Char] = T[2,1]('a T[1,2]('b . T[2,3]('c . .)) T[3,2]('d . .))
+        Which layout do you like most?
      */
     def `P66 (***) Layout a binary tree (3).` {
     }
 
     @Test
-    /**
-Somebody represents binary trees as strings of the following type (see example opposite):
-a(b(d,e),c(,f(g,)))
-Write a method which generates this string representation, if the tree is given as usual (in Nodes and Ends). Use that method for the Tree class's and subclass's toString methods. Then write a method (on the Tree object) which does this inverse; i.e. given the string representation, construct the tree in the usual form.
+    /** Somebody represents binary trees as strings of the following type (see example opposite):
+        a(b(d,e),c(,f(g,)))
+        Write a method which generates this string representation, if the tree is given as usual (in Nodes and Ends).
+        Use that method for the Tree class's and subclass's toString methods.
+        Then write a method (on the Tree object) which does this inverse; i.e. given the string representation, construct the tree in the usual form.
 
-http://aperiodic.net/phil/scala/s-99/p67.gif
+        http://aperiodic.net/phil/scala/s-99/p67.gif
 
-For simplicity, suppose the information in the nodes is a single letter and there are no spaces in the string.
+        For simplicity, suppose the information in the nodes is a single letter and there are no spaces in the string.
 
-scala> Node('a', Node('b', Node('d'), Node('e')), Node('c', End, Node('f', Node('g'), End))).toString
-res0: String = a(b(d,e),c(,f(g,)))
+        scala> Node('a', Node('b', Node('d'), Node('e')), Node('c', End, Node('f', Node('g'), End))).toString
+        res0: String = a(b(d,e),c(,f(g,)))
 
-scala> Tree.fromString("a(b(d,e),c(,f(g,)))")
-res1: Node[Char] = a(b(d,e),c(,f(g,)))
+        scala> Tree.fromString("a(b(d,e),c(,f(g,)))")
+        res1: Node[Char] = a(b(d,e),c(,f(g,)))
      */
     def `P67 (**) A string representation of binary trees.` {
     }
@@ -724,6 +785,29 @@ res1: Node[Char] = a(b(d,e),c(,f(g,)))
     }
 
     // MULTI-WAY TREES
+    /** A multiway tree is composed of a root element and a (possibly empty) set of successors which are multiway trees themselves.
+        A multiway tree is never empty. The set of successor trees is sometimes called a forest.
+
+        The code to represent these is somewhat simpler than the code for binary trees,
+        partly because we don't separate classes for nodes and terminators,
+        and partly because we don't need the restriction that the value type be ordered.
+
+        <pre>
+        case class MTree[+T](value: T, children: List[MTree[T]]) {
+          def this(value: T) = this(value, List())
+          override def toString = "M(" + value.toString + " {" + children.map(_.toString).mkString(",") + "})"
+        }
+
+        object MTree {
+          def apply[T](value: T) = new MTree(value, List())
+          def apply[T](value: T, children: List[MTree[T]]) = new MTree(value, children)
+        }
+        </pre>
+
+        The example tree is, thus:
+
+        MTree('a', List(MTree('f', List(MTree('g'))), MTree('c'), MTree('b', List(MTree('d'), MTree('e')))))
+     */
 
     @Test
     @Ignore
@@ -776,19 +860,23 @@ res1: Node[Char] = a(b(d,e),c(,f(g,)))
     }
 
     @Test
-    /**
-There is a particular notation for multiway trees in Lisp. Lisp is a prominent functional programming language. In Lisp almost everything is a list.
-Our example tree would be represented in Lisp as (a (f g) c (b d e)). The following pictures give some more examples.
+    /** There is a particular notation for multiway trees in Lisp.
+        Lisp is a prominent functional programming language. In Lisp almost everything is a list.
+        Our example tree would be represented in Lisp as (a (f g) c (b d e)). The following pictures give some more examples.
 
-http://aperiodic.net/phil/scala/s-99/p73.png
+        http://aperiodic.net/phil/scala/s-99/p73.png
 
-Note that in the "lispy" notation a node with successors (children) in the tree is always the first element in a list, followed by its children. The "lispy" representation of a multiway tree is a sequence of atoms and parentheses '(' and ')', with the atoms separated by spaces. We can represent this syntax as a Scala String. Write a method lispyTree which constructs a "lispy string" from an MTree.
+        Note that in the "lispy" notation a node with successors (children) in the tree is always the first element in a list, followed by its children.
+        The "lispy" representation of a multiway tree is a sequence of atoms and parentheses '(' and ')', with the atoms separated by spaces.
+        We can represent this syntax as a Scala String. Write a method lispyTree which constructs a "lispy string" from an MTree.
 
-scala> MTree("a", List(MTree("b", List(MTree("c"))))).lispyTree
-res0: String = (a (b c))
-As a second, even more interesting, exercise try to write a method that takes a "lispy" string and turns it into a multiway tree.
+        scala> MTree("a", List(MTree("b", List(MTree("c"))))).lispyTree
+        res0: String = (a (b c))
+        As a second, even more interesting, exercise try to write a method that takes a "lispy" string and turns it into a multiway tree.
 
-[Note: Much of this problem is taken from the wording of the same problem in the Prolog set. This is certainly one way of looking at Lisp notation, but it's not how the language actually represents that syntax internally. I can elaborate more on this, if requested. <PMG>]
+        [Note: Much of this problem is taken from the wording of the same problem in the Prolog set.
+        This is certainly one way of looking at Lisp notation, but it's not how the language actually represents that syntax internally.
+        I can elaborate more on this, if requested. <PMG>]
      */
     def `P73 (**) Lisp-like tree representation.` {
     }
