@@ -2,4 +2,9 @@ A set of junit tests that facilitate learning scala.
 
 At this point I'm focusing on S-99 from http://aperiodic.net/phil/scala/s-99/
 
+The S-99 unit tests are in src/test/scala and packages problems.s99.a thru problems.s99.e
+indicating the general order in which to approach them.
+
+I've provided some scala classes/objects in src/main/scala where you can implement your solutions.
+
 In the future, I plan on adding more katas as I think of them.
